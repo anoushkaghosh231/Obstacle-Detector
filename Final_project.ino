@@ -1,5 +1,4 @@
 
-#include <IRremote.h>
 #include <EEPROM.h>
 #include <LiquidCrystal.h>
 #define LCD_RS A5
@@ -9,13 +8,6 @@
 #define LCD_D6 8
 #define LCD_D7 9
 LiquidCrystal lcd(LCD_RS,LCD_E,LCD_D4,LCD_D5,LCD_D6,LCD_D7);
-
-#define IR_RECEIVE 5
-#define IR_PLAY 5
-#define IR_OFF 0
-#define IR_EQ 13
-#define IR_UP 10
-#define IR_DOWN 8
 
 #define WARNING_LED 11
 unsigned long lastTimeWarning=millis();
@@ -126,10 +118,10 @@ void printLCDDistance(double distance){
     
     lcd.setCursor(0,1);
     if (distance>100.0){
-      lcd.print("no obstacle");
+      lcd.print("no obstacle     ");
     }
     else{
-      lcd.print("warning");
+      lcd.print("warning         ");
     }
   }
   else if (lcdMode=MODE_SETTINGS){
@@ -137,35 +129,6 @@ void printLCDDistance(double distance){
     lcd.print("Press OFF       ");
     lcd.setCursor(0,1);
     lcd.print("to reset setting");
-  }
-}
-
-void handleIR(long command){
-  switch (command){
-    case IR_PLAY:{
-      unlock();
-      lcd.clear();
-      break;
-    }
-    case IR_OFF:{
-      resetSetting();
-      break;
-    }
-    case IR_EQ:{
-      toggleDistanceUnit();
-      break;
-    }
-    case IR_UP:{
-      togglelcd();
-      break;
-    }
-    case IR_DOWN:{
-      togglelcd();
-      break;
-    }
-    default:{
-      //meow
-    }
   }
 }
 
@@ -223,7 +186,6 @@ void setup() {
 
   lcd.begin(16,2);
   lcd.print("Meow");
-  IrReceiver.begin(IR_RECEIVE);
 
   distanceUnit=EEPROM.read(EEPROM_ADDRESS);
   if (distanceUnit==255){
@@ -279,10 +241,5 @@ void loop() {
       //blinking
       warningLEDState=(warningLEDState == HIGH) ? LOW : HIGH;
       digitalWrite(WARNING_LED, warningLEDState);
-  }
-  if (IrReceiver.decode()){
-    IrReceiver.resume();
-    long command=IrReceiver.decodedIRData.command;
-    handleIR(command);
-  }  
+  } 
 }
